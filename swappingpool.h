@@ -1,3 +1,5 @@
+//#define NOTCOLLECTIONS_NO_DESTRUCT
+
 #pragma once
 template <typename T>
 class SwappingPool
@@ -12,7 +14,7 @@ public:
 	SwappingPool(size_t size)
 		: size(size)
 	{
-		data = new T[size];
+		data = static_cast<T*>(malloc(size * sizeof(T)));
 	}
 
 	T& operator [] (size_t i)
@@ -39,6 +41,9 @@ public:
 			return;
 
 		headi--;
+#ifndef NOTCOLLECTIONS_NO_DESTRUCT
+		data[headi].~T();
+#endif
 
 		if (headi == 0)
 			return;
@@ -59,7 +64,12 @@ public:
 
 	~SwappingPool()
 	{
-		delete[] data;
+#ifndef NOTCOLLECTIONS_NO_DESTRUCT
+		for (T& t : *this)
+			t.~T();
+#endif
+
+		free(data);
 	}
 
 	class iterator {
@@ -73,9 +83,6 @@ public:
 		T* ptr;
 	};
 
-	iterator begin() const { return iterator(val); }
-	iterator end() const { return iterator(val + headi); }
-
-private:
-	T* val;
+	iterator begin() const { return iterator(data); }
+	iterator end() const { return iterator(data + headi); }
 };
