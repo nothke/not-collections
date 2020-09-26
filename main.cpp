@@ -39,19 +39,27 @@ int main()
 
 		TestStruct& s0 = pool.get();
 		// Call constructor explicitly
-		new (&s0) TestStruct(10, 10);
+		new (&s0) TestStruct(1, 10);
 
 		TestStruct& s1 = pool.get();
-		new (&s1) TestStruct(4, 4);
+		new (&s1) TestStruct(2, 4);
 
 		std::cout << "Alive count: " << pool.getAliveCount() << "\n";
 
 		// Explicitely release
 		pool.release(s0);
+		pool.release(s1);
 
 		// Acquire another
 		TestStruct& s2 = pool.get();
-		new (&s2) TestStruct();
+		new (&s2) TestStruct(3, 0);
+
+		std::cout << "Alive count before range for: " << pool.getAliveCount() << "\n";
+
+		for (auto& s : pool)
+		{
+			s.Debug();
+		}
 
 		// "pool" deallocates here, when leaving the scope
 		// releasing all elements in the process

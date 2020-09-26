@@ -49,6 +49,17 @@ public:
 		return alive[index];
 	}
 
+	const size_t indexOf(T* eptr) const
+	{
+		return static_cast<size_t>(eptr - &data[0]);
+	}
+
+	const bool isAlive(T* eptr) const
+	{
+		size_t index = indexOf(eptr);
+		return alive[index];
+	}
+
 	inline const int getAliveCount() const
 	{
 		return size - freect;
@@ -98,4 +109,26 @@ public:
 
 		free(data);
 	}
+
+	class iterator {
+	public:
+		iterator(const WalkingPool<T>& pool, T* ptr) : pool(pool), ptr(ptr) {}
+		iterator operator++() {
+			++ptr;
+			
+			//while (ptr != (pool.data + pool.size) && !pool.isAlive(ptr))
+				//++ptr;
+
+			return *this;
+		}
+		bool operator!=(const iterator& other) const { return ptr != other.ptr; }
+		T& operator*() { return *ptr; }
+		const T& operator*() const { return *ptr; }
+	private:
+		const WalkingPool<T>& pool;
+		T* ptr;
+	};
+
+	iterator begin() const { return iterator(*this, data); }
+	iterator end() const { return iterator(*this, data + size); }
 };
