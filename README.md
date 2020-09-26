@@ -8,7 +8,7 @@ There are no inter-dependencies, you can just add whichever you like to your pro
 Note that this repo is being made while still learning C++, so take note that I'm not a genius, and probably some things could've been done a bit better.
 
 Common properties of all containers:
-* These allocators DO NOT [re]initialize memory by default, you'll need to call placement new manually, like `new &pool[i] T(args);`. The reason for this is that you might want to call a custom constructor on an element, and implementing a custom emplace_back()-like within these containers would lead to code bloat.
+* These allocators DO NOT [re]initialize memory by default, you'll need to call placement new manually, like `new (&pool[i]) T(args);`, or set the values without calling the constructor. The reason for this is that you might want to call a custom constructor on an element, and implementing a custom emplace_back()-like within these containers would lead to code bloat.
 * The allocators manage memory in RAII way. They malloc when constructed, and they will deallocate when going out of scope.
 * You'll need to check the size with `isFull()` before inserting an element to prevent going out of bounds, there is no automatic check.
 
