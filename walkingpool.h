@@ -5,7 +5,7 @@ template<typename T>
 class WalkingPool
 {
 	std::vector<bool> alive;
-	std::vector<T> entities;
+	T* data;
 
 	size_t currentIndex;
 	size_t freect;
@@ -25,19 +25,18 @@ public:
 	WalkingPool(const size_t size)
 		:currentIndex(0), freect(size), size(size)
 	{
-		entities.reserve(size);
 		alive.reserve(size);
+		data = static_cast<T*>(malloc(size * sizeof(T)));
 
 		for (size_t i = 0; i < size; i++)
 		{
-			entities.emplace_back();
 			alive.emplace_back(false);
 		}
 	}
 
 	T& operator [] (size_t i)
 	{
-		return entities[i];
+		return data[i];
 	}
 
 	inline const bool isFull() const
@@ -55,11 +54,11 @@ public:
 		return size - freect;
 	}
 
-	// ALWAYS use hasSpace() before calling this
+	// ALWAYS check isFull() before calling this
 	T& get()
 	{
 		if (freect == 0)
-			return entities[currentIndex];
+			return data[currentIndex];
 
 		while (alive[currentIndex])
 			incrementIndex();
@@ -67,23 +66,8 @@ public:
 		alive[currentIndex] = true;
 		freect--;
 
-		Entity& e = entities[currentIndex];
+		T& e = data[currentIndex];
 		return e;
-	}
-
-	// returns nullptr if pool is full
-	T* getAsPtr()
-	{
-		if (freect == 0)
-			return nullptr;
-
-		while (alive[currentIndex])
-			incrementIndex();
-
-		alive[currentIndex] = true;
-		freect--;
-
-		return &entities[currentIndex];
 	}
 
 	void release(T& e)
@@ -94,11 +78,24 @@ public:
 
 	void release(T* eptr)
 	{
-		ptrdiff_t index = eptr - &entities[0];
+		ptrdiff_t index = eptr - &data[0];
 
-		//eptr->~T();
+#ifndef NOTCOLLECTIONS_NO_DESTRUCT
+		eptr->~T();
+#endif
 		freect++;
 
 		alive[index] = false;
+	}
+
+	~WalkingPool()
+	{
+#ifndef NOTCOLLECTIONS_NO_DESTRUCT
+		for (int i; i < size; i++)
+			if (isAlive(i))
+				data[i].~T();
+#endif
+
+		free(data);
 	}
 };

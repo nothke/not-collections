@@ -37,7 +37,9 @@ int main()
 		// Create a walking pool with capacity
 		WalkingPool<TestStruct> pool(32);
 
-		TestStruct& s = pool.get();
+		TestStruct& s0 = pool.get();
+		// Call constructor explicitly
+		new (&s0) TestStruct(10, 10);
 
 		// "pool" deallocates here, when leaving the scope
 	}
