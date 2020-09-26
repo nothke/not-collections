@@ -41,7 +41,20 @@ int main()
 		// Call constructor explicitly
 		new (&s0) TestStruct(10, 10);
 
+		TestStruct& s1 = pool.get();
+		new (&s1) TestStruct(4, 4);
+
+		std::cout << "Alive count: " << pool.getAliveCount() << "\n";
+
+		// Explicitely release
+		pool.release(s0);
+
+		// Acquire another
+		TestStruct& s2 = pool.get();
+		new (&s2) TestStruct();
+
 		// "pool" deallocates here, when leaving the scope
+		// releasing all elements in the process
 	}
 
 	{

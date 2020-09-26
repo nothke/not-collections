@@ -91,7 +91,7 @@ public:
 	~WalkingPool()
 	{
 #ifndef NOTCOLLECTIONS_NO_DESTRUCT
-		for (int i; i < size; i++)
+		for (int i = 0; i < size; i++)
 			if (isAlive(i))
 				data[i].~T();
 #endif
