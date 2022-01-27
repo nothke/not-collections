@@ -72,10 +72,18 @@ public:
 		free(data);
 	}
 
+	size_t indexOf(T& p) const
+	{
+		return &p - data;
+	}
+
 	class iterator {
 	public:
 		iterator(T* ptr) : ptr(ptr) {}
+
+		// Required for range for
 		iterator operator++() { ++ptr; return *this; }
+		bool operator==(const iterator& other) const { return ptr == other.ptr; }
 		bool operator!=(const iterator& other) const { return ptr != other.ptr; }
 		T& operator*() { return *ptr; }
 		const T& operator*() const { return *ptr; }
