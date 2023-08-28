@@ -99,6 +99,17 @@ public:
 		alive[index] = false;
 	}
 
+	void clear()
+	{
+		for (size_t i = 0; i < alive.size(); i++)
+		{
+			alive[i] = false;
+		}
+		
+		freect = size;
+		currentIndex = 0;
+	}
+
 	~WalkingPool()
 	{
 #ifndef NOTCOLLECTIONS_NO_DESTRUCT
@@ -115,7 +126,7 @@ public:
 		iterator(const WalkingPool<T>& pool, T* ptr) : pool(pool), ptr(ptr) {}
 		iterator operator++() {
 			++ptr;
-			
+
 			//while (ptr != (pool.data + pool.size) && !pool.isAlive(ptr))
 				//++ptr;
 

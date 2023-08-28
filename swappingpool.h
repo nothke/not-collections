@@ -1,7 +1,8 @@
-//#define NOTCOLLECTIONS_NO_DESTRUCT
-
 #pragma once
-template <typename T>
+
+#include <cassert>
+
+template <typename T, bool noDestruct = false>
 class SwappingPool
 {
 public:
@@ -14,11 +15,29 @@ public:
 	SwappingPool(size_t size)
 		: size(size)
 	{
+		assert(size > 0);
+
 		data = static_cast<T*>(malloc(size * sizeof(T)));
 	}
 
+	~SwappingPool()
+	{
+		if constexpr (!noDestruct)
+		{
+			for (T& t : *this)
+				t.~T();
+		}
+
+		free(data);
+	}
+
+	/// <summary>
+	/// Only bounds checked by entire size, not by aliveCount
+	/// </summary>
 	T& operator [] (size_t i)
 	{
+		assert(i < size); // bounds check
+
 		return data[i];
 	}
 
@@ -30,49 +49,48 @@ public:
 		return data[headi++]; // increments after get
 	}
 
-	void release(T& e)
+	void releaseAt(size_t index)
 	{
-		release(&e);
-	}
+		assert(index < headi);
 
-	void release(T* eptr)
-	{
 		if (headi == 0)
 			return;
 
 		headi--;
-#ifndef NOTCOLLECTIONS_NO_DESTRUCT
-		data[headi].~T();
-#endif
+
+		if constexpr (!noDestruct)
+			data[headi].~T();
 
 		if (headi == 0)
 			return;
-
-		ptrdiff_t index = eptr - &data[0];
 
 		// put last element into the one on the index
 		//data[index] = data[headi];
 		memcpy(&data[index], &data[headi], sizeof(T));
 	}
 
-	const bool isFull() const
+	void release(T& e)
 	{
-		return headi >= size;
+		release(&e);
 	}
 
-	const size_t aliveCount() const { return headi; }
-
-	~SwappingPool()
+	void release(T* ePtr)
 	{
-#ifndef NOTCOLLECTIONS_NO_DESTRUCT
-		for (T& t : *this)
-			t.~T();
-#endif
+		ptrdiff_t index = ePtr - data;
 
-		free(data);
+		assert(index >= 0);
+		assert(index < headi);
+
+		releaseAt(index);
 	}
 
-	size_t indexOf(T& p) const
+	void clear() { headi = 0; }
+
+	inline const bool isFull() const { return headi >= size; }
+
+	inline const size_t aliveCount() const { return headi; }
+
+	inline size_t indexOf(T& p) const
 	{
 		return &p - data;
 	}
