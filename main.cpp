@@ -198,6 +198,12 @@ int main()
 
 		OutputPool();
 
+		auto& last = pool[pool.aliveCount() - 1];
+		pool.release(last);
+		
+		std::cout << "Released last element:\n";
+		OutputPool();
+
 		for (size_t i = 0; i < 20; i++)
 		{
 			if (Random::Value() < 0.5)
@@ -227,6 +233,85 @@ int main()
 		// "pool" deallocates here, when leaving the scope
 	}
 
+	{
+		std::cout << "\nSTACK VECTOR\n\n";
+
+		StackVector<TestStruct, 8> stackVec;
+
+		stackVec.push(TestStruct(10, 10));
+		auto& pos = stackVec.get();
+		pos.a = 10;
+
+		std::cout << "size: " << stackVec.size() << "\n";
+
+		for (auto& s : stackVec)
+		{
+			s.Debug();
+		}
+
+		std::cout << "\nFIXED VECTOR\n\n";
+
+		FixedVector<TestStruct> fixedVec(8);
+
+		std::cout << "-- created\n";
+
+		auto& loc = fixedVec.pushRef();
+		new (&loc) TestStruct(9, 9);
+
+		//#define INPLACE(x, init) new (&x) init
+
+		auto& loc2 = fixedVec.insertRef(0);
+		loc2.a = 777;
+		loc2.b = 888;
+		loc2.c = 'c';
+
+		std::cout << "-- after push\n";
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			fixedVec.push(TestStruct(4 + i, 5 + i));
+		}
+
+		for (auto& s : fixedVec)
+		{
+			s.Debug();
+		}
+
+		std::cout << "Uninited FixedVector\n";
+		FixedVector<TestStruct> fixedVec2;
+
+		fixedVec2.Init(64);
+
+		fixedVec2.push({});
+
+		std::cout << "\nSTD VECTOR\n\n";
+
+		std::vector<TestStruct> stdVec{};
+		stdVec.reserve(16);
+
+		stdVec.push_back({});
+		std::cout << "^ push_back\n";
+
+		stdVec.emplace_back(1, 2);
+		std::cout << "^ emplace_back\n";
+
+		// Excpected assert fail
+		//for (size_t i = 0; i < 20; i++)
+		//	fixedVec.push({});
+
+		std::cout << "\nAllInOne\n";
+		//auto& all = *new AllInOne();
+		auto& all = *static_cast<AllInOne*>(malloc(sizeof(AllInOne)));
+
+		std::cout << "\nCreated AllInOne\n";
+
+		std::cout << sizeof(all);
+
+		std::cout << "\n\n---- END ----\n\n";
+
+		free(&all);
+		//delete& all;
+	}
 
 	return EXIT_SUCCESS;
 }
