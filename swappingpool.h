@@ -51,8 +51,9 @@ public:
 
 	void releaseAt(size_t index)
 	{
-		assert(index < headi);
+		assert(index < headi); // attempting to release a dead element
 
+		// skip if empty
 		if (headi == 0)
 			return;
 
@@ -61,11 +62,15 @@ public:
 		if constexpr (!noDestruct)
 			data[headi].~T();
 
-		if (headi == 0)
+		// skip swap if only one element remains or is empty
+		if (headi <= 1)
+			return;
+
+		// skip swap if released element is last
+		if (headi == index)
 			return;
 
 		// put last element into the one on the index
-		//data[index] = data[headi];
 		memcpy(&data[index], &data[headi], sizeof(T));
 	}
 
@@ -78,8 +83,9 @@ public:
 	{
 		ptrdiff_t index = ePtr - data;
 
-		assert(index >= 0);
-		assert(index < headi);
+		assert(index >= 0); // out of bounds, wrong pointer?
+		assert(static_cast<size_t>(index) < size); // out of bounds, wrong pointer?
+		assert(static_cast<size_t>(index) < headi); // attempting to release a dead element
 
 		releaseAt(index);
 	}
