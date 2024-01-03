@@ -4,6 +4,7 @@
 #include "swappingpool.h"
 #include "stackvector.h"
 #include "fixed_vector.h"
+#include "ring_buffer.h"
 
 struct TestStruct
 {
@@ -60,6 +61,7 @@ namespace Random
 
 int main()
 {
+	/*
 	{
 		std::cout << "\nWALKING POOL\n\n";
 
@@ -80,7 +82,7 @@ int main()
 			}
 
 			std::cout << "|\n";
-		};
+			};
 
 		int seq = 0;
 
@@ -88,7 +90,7 @@ int main()
 			TestStruct& _s = pool.get();
 			new (&_s) TestStruct(seq++, 42);
 			OutputPool();
-		};
+			};
 
 		TestStruct& s0 = pool.get();
 		// Call constructor explicitly
@@ -161,7 +163,7 @@ int main()
 			}
 
 			std::cout << "|\n";
-		};
+			};
 
 		int seq = 0;
 
@@ -200,7 +202,7 @@ int main()
 
 		auto& last = pool[pool.aliveCount() - 1];
 		pool.release(last);
-		
+
 		std::cout << "Released last element:\n";
 		OutputPool();
 
@@ -311,6 +313,154 @@ int main()
 
 		free(&all);
 		//delete& all;
+	}
+	*/
+
+	{
+		std::cout << "\nRING BUFFER\n\n";
+
+		RingBuffer<int> buffer;
+
+		const auto OutputRingBuffer = [&]() {
+			std::cout << "\n|";
+
+			for (size_t i = 0; i < buffer.capacity; i++)
+			{
+				std::cout << std::setw(3);
+
+				if (buffer.tail == i)
+					std::cout << "T";
+
+				if (buffer.head == i)
+					std::cout << "H";
+
+				if (buffer.tail != i && buffer.head != i)
+					std::cout << " ";
+
+				std::cout << " :";
+			}
+
+			std::cout << "|\n|";
+
+			for (size_t i = 0; i < buffer.capacity; i++)
+			{
+				std::cout << std::setw(3) << buffer.data[i];
+				std::cout << " :";
+			}
+
+			std::cout << "|\n";
+
+			std::cout << "size: " << buffer.size << "\n";
+			};
+
+		buffer.allocHeap(4);
+
+		int a = 1;
+
+		for (size_t i = 0; i < 100; i++)
+		{
+			int randi = Random::Range(0, 4);
+
+			if (randi == 0)
+			{
+				std::cout << "pushBack" << "\n";
+				buffer.pushBack(a++);
+			}
+			else if (randi == 1)
+			{
+				std::cout << "pushFront" << "\n";
+				buffer.pushFront(a++);
+			}
+			else
+			{
+				if (!buffer.isEmpty())
+				{
+					if (randi == 2)
+					{
+						std::cout << "popBack" << "\n";
+						buffer.popBack();
+					}
+					else if (randi == 3)
+					{
+						std::cout << "popFront" << "\n";
+						buffer.popFront();
+					}
+				}
+			}
+
+			OutputRingBuffer();
+		}
+
+		/*
+		buffer.pushBack(a++);
+
+		for (int i = 0; i < 4; i++)
+		{
+			buffer.pushBack(a++);
+			OutputRingBuffer();
+		}
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			buffer.popBack();
+			OutputRingBuffer();
+		}
+
+		for (size_t i = 0; i < 10; i++)
+		{
+			buffer.pushFront(100 - i);
+			OutputRingBuffer();
+		}
+
+		buffer.pushFront(666);
+		OutputRingBuffer();
+
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			buffer.popFront();
+			OutputRingBuffer();
+		}
+		*/
+
+
+		/*
+		OutputRingBuffer();
+
+		for (int i = 0; i < 10; i++)
+		{
+			buffer.pushBack(i);
+			OutputRingBuffer();
+		}
+
+		buffer.popBack();
+		OutputRingBuffer();
+		buffer.popBack();
+		OutputRingBuffer();
+		buffer.popBack();
+		OutputRingBuffer();
+		buffer.popBack();
+		OutputRingBuffer();
+
+		for (int i = 0; i < 10; i++)
+		{
+			buffer.pushBack(i);
+			OutputRingBuffer();
+		}
+
+		buffer.pushFront(99);
+		OutputRingBuffer();
+		buffer.pushFront(98);
+		OutputRingBuffer();
+		buffer.pushFront(97);
+		OutputRingBuffer();
+		buffer.pushFront(96);
+		OutputRingBuffer();
+		buffer.pushFront(95);
+		OutputRingBuffer();
+		buffer.pushFront(94);
+		OutputRingBuffer();
+		*/
 	}
 
 	return EXIT_SUCCESS;

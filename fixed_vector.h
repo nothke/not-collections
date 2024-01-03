@@ -3,6 +3,9 @@
 
 #define NTK_CHECK_UNINITED assert(data != nullptr && "Using an uninitialized FixedVector")
 
+/// <summary>
+/// FixedVector is a vector-like that doesn't grow
+/// </summary>
 template <typename T>
 class FixedVector
 {
