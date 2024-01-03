@@ -316,11 +316,11 @@ int main()
 	}
 	*/
 
-#if false
 	{
 		std::cout << "\nRING BUFFER\n\n";
 
-		RingBuffer<int> buffer;
+		RingBuffer<int> buffer(32);
+		buffer.allocHeap();
 
 		const auto OutputRingBuffer = [&]() {
 			std::cout << "\n|";
@@ -354,13 +354,10 @@ int main()
 			std::cout << "size: " << buffer.size << "\n";
 			};
 
-		buffer.allocHeap(64);
-
 		int a = 1;
 
 		// Random pushes and pops from both sides
 
-		/*
 		for (size_t i = 0; i < 100; i++)
 		{
 			int randi = Random::Range(0, 4);
@@ -399,17 +396,10 @@ int main()
 
 		OutputRingBuffer();
 
-		for (size_t i = 0; i < buffer.size; i++)
-		{
-			std::cout << buffer[i] << "\n";
-		}
-		*/
-
-
-		for (size_t i = 0; i < 1000; i++)
-		{
-			buffer.pushBack(a++);
-		}
+		//for (size_t i = 0; i < 1000; i++)
+		//{
+		//	buffer.pushBack(a++);
+		//}
 
 		OutputRingBuffer();
 
@@ -498,7 +488,6 @@ int main()
 		OutputRingBuffer();
 		*/
 	}
-#endif
 
 	{
 		//RingBuffer<TestStruct> buffer(32);
@@ -511,43 +500,43 @@ int main()
 	}
 
 	{
-		std::cout << "\nRingBuffer ctor/dtor:\n";
+	//	std::cout << "\nRingBuffer ctor/dtor:\n";
 
-		RingBuffer<TestStruct> buffer(4);
-		char buf[4 * sizeof(TestStruct)];
-		buffer.setBuffer(reinterpret_cast<TestStruct*>(buf));
+	//	RingBuffer<TestStruct> buffer(4);
+	//	char buf[4 * sizeof(TestStruct)];
+	//	buffer.setBuffer(reinterpret_cast<TestStruct*>(buf));
 
-		auto& a = buffer.pushBack({});
-		a.a = 100;
-		TestStruct temp;
-		buffer.pushBack(temp);
-		buffer.pushBack(temp);
-		buffer.pushBack(temp);
-		buffer.pushBack(temp);
-		buffer.pushBack(temp);
-		buffer.pushBack(temp);
+	//	auto& a = buffer.pushBack({});
+	//	a.a = 100;
+	//	TestStruct temp;
+	//	buffer.pushBack(temp);
+	//	buffer.pushBack(temp);
+	//	buffer.pushBack(temp);
+	//	buffer.pushBack(temp);
+	//	buffer.pushBack(temp);
+	//	buffer.pushBack(temp);
 
-		for (auto& s : buffer)
-		{
-			s.Debug();
-		}
-	}
+	//	for (auto& s : buffer)
+	//	{
+	//		s.Debug();
+	//	}
+	//}
 
-	{
-		std::cout << "\nvector ctor/dtor:\n";
+	//{
+	//	std::cout << "\nvector ctor/dtor:\n";
 
-		std::vector<TestStruct> vec;
-		vec.reserve(12);
+	//	std::vector<TestStruct> vec;
+	//	vec.reserve(12);
 
-		vec.emplace_back();
-		vec.emplace_back();
-		vec.emplace_back();
-		vec.emplace_back();
+	//	vec.emplace_back();
+	//	vec.emplace_back();
+	//	vec.emplace_back();
+	//	vec.emplace_back();
 
-		for (auto& s : vec)
-		{
-			s.Debug();
-		}
+	//	for (auto& s : vec)
+	//	{
+	//		s.Debug();
+	//	}
 	}
 
 	return EXIT_SUCCESS;
