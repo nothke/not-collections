@@ -93,4 +93,11 @@ public:
 
 	bool isEmpty() const { return size == 0; }
 	bool isFull() const { return size >= capacity; }
+
+	const T& operator [] (size_t i) const
+	{
+		assert(i < size); // bounds check
+
+		return data[(tail + i) % capacity];
+	}
 };

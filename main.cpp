@@ -357,6 +357,8 @@ int main()
 
 		int a = 1;
 
+		// Random pushes and pops from both sides
+
 		for (size_t i = 0; i < 100; i++)
 		{
 			int randi = Random::Range(0, 4);
@@ -389,6 +391,15 @@ int main()
 			}
 
 			OutputRingBuffer();
+		}
+
+		buffer.pushBack(a++);
+
+		OutputRingBuffer();
+
+		for (size_t i = 0; i < buffer.size; i++)
+		{
+			std::cout << buffer[i] << "\n";
 		}
 
 		/*
