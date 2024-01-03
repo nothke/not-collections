@@ -1,7 +1,9 @@
 #pragma once
 #include <cassert>
-#include <malloc.h>
 
+/// <summary>
+/// Before using, you need to either allocHeap, or setBuffer.
+/// </summary>
 template <typename T>
 class RingBuffer {
 public:
@@ -9,12 +11,25 @@ public:
 	size_t head{ 0 };
 	size_t tail{ 0 };
 
-	size_t capacity{ 0 };
+	const size_t capacity;
 	size_t size{ 0 };
 
-	void allocHeap(size_t _capacity) {
-		capacity = _capacity;
+	bool shouldFree{ false };
+
+	RingBuffer(size_t _capacity) : capacity(_capacity) {}
+
+	void allocHeap() {
 		data = static_cast<T*>(calloc(capacity, sizeof(T)));
+		shouldFree = true;
+	}
+
+	~RingBuffer() {
+		if constexpr (std::is_destructible<T>())
+			for (size_t i = 0; i < size; i++)
+				(*this)[i].~T();
+
+		if (shouldFree)
+			free(data);
 	}
 
 	void setBuffer(T* buffer) {

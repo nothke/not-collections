@@ -316,6 +316,7 @@ int main()
 	}
 	*/
 
+#if false
 	{
 		std::cout << "\nRING BUFFER\n\n";
 
@@ -353,7 +354,7 @@ int main()
 			std::cout << "size: " << buffer.size << "\n";
 			};
 
-		buffer.allocHeap(4);
+		buffer.allocHeap(64);
 
 		int a = 1;
 
@@ -405,24 +406,21 @@ int main()
 		*/
 
 
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
-		buffer.pushBack(a++);
+		for (size_t i = 0; i < 1000; i++)
+		{
+			buffer.pushBack(a++);
+		}
 
 		OutputRingBuffer();
 
-		std::cout << "normal for:" << "\n";
+		std::cout << "\nnormal for:\n";
 
 		for (size_t i = 0; i < buffer.size; i++)
 		{
 			std::cout << buffer[i] << "\n";
 		}
 
-		std::cout << "range for:" << "\n";
+		std::cout << "\nrange for:\n";
 
 		for (auto& i : buffer)
 		{
@@ -499,6 +497,57 @@ int main()
 		buffer.pushFront(94);
 		OutputRingBuffer();
 		*/
+	}
+#endif
+
+	{
+		//RingBuffer<TestStruct> buffer(32);
+		//buffer.allocHeap();
+
+		//auto& a = buffer.pushBack({});
+		//a.a = 100;
+
+		//a.Debug();
+	}
+
+	{
+		std::cout << "\nRingBuffer ctor/dtor:\n";
+
+		RingBuffer<TestStruct> buffer(4);
+		char buf[4 * sizeof(TestStruct)];
+		buffer.setBuffer(reinterpret_cast<TestStruct*>(buf));
+
+		auto& a = buffer.pushBack({});
+		a.a = 100;
+		TestStruct temp;
+		buffer.pushBack(temp);
+		buffer.pushBack(temp);
+		buffer.pushBack(temp);
+		buffer.pushBack(temp);
+		buffer.pushBack(temp);
+		buffer.pushBack(temp);
+
+		for (auto& s : buffer)
+		{
+			s.Debug();
+		}
+	}
+
+	{
+		std::cout << "\nvector ctor/dtor:\n";
+
+		std::vector<TestStruct> vec;
+		vec.reserve(12);
+
+		vec.emplace_back();
+		vec.emplace_back();
+		vec.emplace_back();
+		vec.emplace_back();
+
+		for (auto& s : vec)
+		{
+			s.Debug();
+		}
 	}
 
 	return EXIT_SUCCESS;
