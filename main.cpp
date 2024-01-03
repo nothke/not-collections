@@ -359,6 +359,7 @@ int main()
 
 		// Random pushes and pops from both sides
 
+		/*
 		for (size_t i = 0; i < 100; i++)
 		{
 			int randi = Random::Range(0, 4);
@@ -400,6 +401,32 @@ int main()
 		for (size_t i = 0; i < buffer.size; i++)
 		{
 			std::cout << buffer[i] << "\n";
+		}
+		*/
+
+
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+		buffer.pushBack(a++);
+
+		OutputRingBuffer();
+
+		std::cout << "normal for:" << "\n";
+
+		for (size_t i = 0; i < buffer.size; i++)
+		{
+			std::cout << buffer[i] << "\n";
+		}
+
+		std::cout << "range for:" << "\n";
+
+		for (auto& i : buffer)
+		{
+			std::cout << i << "\n";
 		}
 
 		/*

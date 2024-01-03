@@ -100,4 +100,39 @@ public:
 
 		return data[(tail + i) % capacity];
 	}
+
+	class iterator {
+	private:
+		T* ptr;
+		const T* wrapPoint;
+		size_t index;
+		const size_t capacity;
+
+	public:
+		iterator(T* _ptr, T* _wrapPoint, size_t _index, size_t _capacity) :
+			ptr(_ptr),
+			index(_index),
+			wrapPoint(_wrapPoint),
+			capacity(_capacity) {}
+
+		// Required for range for
+		iterator operator++() {
+			ptr++;
+			index++;
+
+			if (ptr == wrapPoint)
+				ptr -= capacity;
+
+			return *this;
+		}
+
+		bool operator==(const iterator& other) const { return index == other.index; }
+		bool operator!=(const iterator& other) const { return index != other.index; }
+		T& operator*() { return *ptr; }
+		const T& operator*() const { return *ptr; }
+
+	};
+
+	iterator begin() const { return iterator(data + tail, data + capacity, 0, capacity); }
+	iterator end() const { return iterator(data + head, data + capacity, size, capacity); }
 };
